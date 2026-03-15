@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SimpleVideoScene" extends="Scene">
+  <children>
+
+    <Overhang
+      showClock="true"
+      title="Media Browser"
+      logoUri="pkg:/images/logo.png" />
+
+    <MarkupList
+      id="fileList"
+      translation="[100, 150]"
+      itemSize="[1720, 64]"
+      itemComponentName="FileListItem"
+      visible="false"/>
+
+    <Label
+      id="statusLabel"
+      translation="[100, 500]"
+      color="0xFFFFFFFF"
+      font="font:LargeBoldSystemFont"
+      text="Loading..."/>
+
+    <Video
+      id="Video"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      visible="false"/>
+
+    <Dialog
+      id="WarningDialog"
+      title="Unsupported Format"
+      message=""
+      buttons="[&quot;OK&quot;]"
+      visible="false" />
+
+    <Exiter id="Exiter"/>
+    <FetchFilesTask id="fetcher"/>
+
+  </children>
+
+  <script type="text/brightscript" uri="pkg:/source/config.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/SimpleVideoScene.brs"/>
+</component>

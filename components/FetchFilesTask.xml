@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="FetchFilesTask" extends="Task">
+  <interface>
+    <field id="path"    type="string"    value=""/>
+    <field id="entries" type="array"/>
+    <field id="status"  type="string"    value=""/>
+  </interface>
+  <script type="text/brightscript" uri="pkg:/source/config.brs"/>
+  <script type="text/brightscript">
+    <![CDATA[
+      sub init()
+        m.top.functionName = "fetchFiles"
+      end sub
+
+      sub fetchFiles()
+        url = getServerUrl() + "/objects/" + urlEncodePath(m.top.path)
+        if Right(url, 1) <> "/" then url = url + "/"
+        transfer = CreateObject("roUrlTransfer")
+        transfer.SetUrl(url)
+        transfer.AddHeader("Authorization", "Bearer " + getApiKey())
+
+        response = transfer.GetToString()
+        if response = invalid or response = ""
+          m.top.status = "error"
+          return
+        end if
+
+        data = ParseJson(response)
+        if data = invalid
+          m.top.status = "error"
+          return
+        end if
+
+        dirs  = []
+        files = []
+
+        for each item in data
+          parts   = item.path.Split("/")
+          name    = parts[parts.Count() - 1]
+          sf = ""
+          if item.streamFormat <> invalid then sf = item.streamFormat
+
+          iconUri = "pkg:/images/icon_file.png"
+          if item.type = "directory"
+            iconUri = "pkg:/images/icon_folder.png"
+          else if sf = "mp4" or sf = "mkv" or sf = "hls" or sf = "dash"
+            iconUri = "pkg:/images/icon_video.png"
+          else if sf = "mp3" or sf = "mka" or sf = "mks"
+            iconUri = "pkg:/images/icon_audio.png"
+          end if
+
+          entry = {
+            name:         name,
+            path:         item.path,
+            url:          getServerUrl() + "/objects/" + urlEncodePath(item.path),
+            type:         item.type,
+            streamFormat: sf,
+            iconUri:      iconUri
+          }
+
+          if item.type = "directory"
+            dirs.Push(entry)
+          else
+            files.Push(entry)
+          end if
+        end for
+
+        dirs  = insertionSortByName(dirs)
+        files = insertionSortByName(files)
+
+        result = []
+        for each d in dirs
+          result.Push(d)
+        end for
+        for each f in files
+          result.Push(f)
+        end for
+
+        m.top.entries = result
+        m.top.status  = "done"
+      end sub
+
+      function insertionSortByName(arr as Object) as Object
+        n = arr.Count()
+        for i = 1 to n - 1
+          key = arr[i]
+          j   = i - 1
+          while j >= 0 and LCase(arr[j].name) > LCase(key.name)
+            arr[j + 1] = arr[j]
+            j = j - 1
+          end while
+          arr[j + 1] = key
+        end for
+        return arr
+      end function
+    ]]>
+  </script>
+</component>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="FileListItem" extends="Group">
+  <interface>
+    <field id="width" type="float"/>
+    <field id="height" type="float"/>
+    <field id="itemContent" type="node" onChange="onItemContent"/>
+    <field id="focusPercent" type="float" onChange="onFocusPercent"/>
+  </interface>
+  <children>
+    <Rectangle id="focusBg" color="0x3D6FA8FF" opacity="0" width="1720" height="64"/>
+    <Poster id="icon" width="48" height="48" loadWidth="48" loadHeight="48" loadDisplayMode="scaleToFit" translation="[16, 8]"/>
+    <Label id="label" translation="[80, 16]" color="0xFFFFFFFF" font="font:MediumSystemFont"/>
+  </children>
+  <script type="text/brightscript" uri="pkg:/components/FileListItem.brs"/>
+</component>

@@ -1,0 +1,4 @@
+roku_app.zip
+*.pyc
+__pycache__/
+source/config.brs
