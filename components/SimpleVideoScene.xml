@@ -28,6 +28,22 @@
       translation="[0,0]"
       visible="false"/>
 
+    <Rectangle
+      id="filenameBg"
+      translation="[28, 28]"
+      width="444"
+      height="52"
+      color="0x00000099"
+      visible="false"/>
+
+    <Label
+      id="filenameLabel"
+      translation="[40, 40]"
+      color="0xFFFFFFFF"
+      font="font:MediumBoldSystemFont"
+      text=""
+      visible="false"/>
+
     <Dialog
       id="WarningDialog"
       title="Unsupported Format"
@@ -35,7 +51,7 @@
       buttons="[&quot;OK&quot;]"
       visible="false" />
 
-    <Exiter id="Exiter"/>
+<Exiter id="Exiter"/>
     <FetchFilesTask id="fetcher"/>
 
   </children>

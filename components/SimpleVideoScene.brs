@@ -5,6 +5,8 @@ sub init()
     m.fetcher    = m.top.findNode("fetcher")
     m.warning    = m.top.findNode("WarningDialog")
     m.exiter     = m.top.findNode("Exiter")
+    m.filenameBg    = m.top.findNode("filenameBg")
+    m.filenameLabel = m.top.findNode("filenameLabel")
 
     m.currentPath = ""
     m.entries     = []
@@ -12,6 +14,7 @@ sub init()
     m.fetcher.observeField("status", "onFetchStatus")
     m.fileList.observeField("itemSelected", "onItemSelected")
     m.video.observeField("state", "onVideoState")
+    m.video.observeField("trickPlayStatus", "onTrickPlayStatus")
     m.warning.observeField("buttonSelected", "onWarningClosed")
 
     m.statusLabel.text    = "Loading..."
@@ -86,6 +89,9 @@ sub playVideo(entry as Object)
     contentNode.streamFormat = fmt
     contentNode.HttpHeaders  = ["Authorization: Bearer " + getApiKey()]
     m.video.content          = contentNode
+    filename = entry.name
+    if Len(filename) > 35 then filename = Left(filename, 35)
+    m.filenameLabel.text = filename
     m.video.visible     = true
     m.video.control     = "play"
     m.video.setFocus(true)
@@ -96,9 +102,37 @@ sub onWarningClosed()
     m.fileList.setFocus(true)
 end sub
 
+function isTrickPlay() as Boolean
+    tps = m.video.trickPlayStatus
+    if tps = invalid then return false
+    speed = tps.speed
+    if speed = invalid then return false
+    return speed <> 0 and speed <> 1
+end function
+
+sub onTrickPlayStatus()
+    if isTrickPlay()
+        m.filenameLabel.visible = true
+        m.filenameBg.visible    = true
+    else if m.video.state = "playing"
+        m.filenameLabel.visible = false
+        m.filenameBg.visible    = false
+    end if
+end sub
+
 sub onVideoState()
     state = m.video.state
-    if state = "error" or state = "finished"
+    if state = "paused"
+        m.filenameLabel.visible = true
+        m.filenameBg.visible    = true
+    else if state = "playing"
+        if not isTrickPlay()
+            m.filenameLabel.visible = false
+            m.filenameBg.visible    = false
+        end if
+    else if state = "error" or state = "finished"
+        m.filenameLabel.visible = false
+        m.filenameBg.visible    = false
         m.video.control    = "stop"
         m.video.visible    = false
         m.fileList.visible = true
@@ -132,6 +166,8 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     if press
         if key = "back"
             if m.video.visible
+                m.filenameLabel.visible = false
+                m.filenameBg.visible    = false
                 m.video.control   = "stop"
                 m.video.visible   = false
                 m.fileList.visible = true
